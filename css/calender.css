@@ -9,7 +9,6 @@ body {
     background-color: #f9fafb;
     color: #1f2937;
     -webkit-font-smoothing: antialiased;
-  
 }
 
 .app-container {
@@ -77,6 +76,7 @@ body {
     flex: 1 1 auto;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    min-height: 0; /* iOS fix */
 }
 
 .hidden {
@@ -94,6 +94,7 @@ body {
     display: flex;
     height: 100%;
     min-width: max-content;
+    position: relative;
 }
 
 .day-column {
@@ -103,6 +104,8 @@ body {
     border-right: 1px solid #e5e7eb;
     display: flex;
     flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0; /* iOS fix */
 }
 
 .day-header {
@@ -127,9 +130,11 @@ body {
 }
 
 .tasks-list {
-    flex: 1;
+    flex: 1 1 auto; /* allow proper flex growth */
     padding: 16px;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch; /* smooth scrolling */
+    min-height: 0; /* iOS fix */
 }
 
 /* Task Cards */
@@ -181,59 +186,7 @@ body {
     pointer-events: none;
 }
 
-/* To-Do Items */
-.todo-items {
-    margin-top: 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.todo-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: white;
-    font-size: 14px;
-}
-
-.todo-checkbox {
-    width: 16px;
-    height: 16px;
-    border: 2px solid white;
-    border-radius: 4px;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.todo-checkbox.checked {
-    background-color: white;
-}
-
-.todo-checkbox svg {
-    width: 10px;
-    height: 10px;
-}
-
-.todo-text {
-    flex: 1;
-}
-
-.todo-text.completed {
-    text-decoration: line-through;
-    opacity: 0.75;
-}
-
-.daily-tag {
-    margin-top: 4px;
-    font-size: 12px;
-    color: white;
-    opacity: 0.75;
-}
-
-/* Task Edit Mode */
+/* Inputs & Editing */
 .task-edit {
     background: white;
     border-radius: 8px;
@@ -258,216 +211,13 @@ body {
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-.todo-section-title {
-    font-size: 14px;
-    font-weight: 500;
-    color: #374151;
-    margin-bottom: 8px;
-}
-
-.todo-edit-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 8px;
-}
-
-.todo-edit-checkbox {
-    width: 16px;
-    height: 16px;
-    cursor: pointer;
-}
-
-.todo-edit-input {
-    flex: 1;
-    padding: 8px;
-    border: 1px solid #d1d5db;
-    border-radius: 4px;
-    font-size: 13px;
-}
-
-.todo-edit-input.completed {
-    text-decoration: line-through;
-    color: #9ca3af;
-}
-
-.delete-todo-btn {
-    padding: 4px;
-    background: transparent;
-    border: none;
-    color: #ef4444;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.delete-todo-btn:hover {
-    background-color: #fee2e2;
-    border-radius: 4px;
-}
-
-.add-todo-btn {
-    width: 100%;
-    padding: 8px;
-    border: 1px dashed #d1d5db;
-    background: transparent;
-    border-radius: 6px;
-    color: #6b7280;
-    font-size: 13px;
-    cursor: pointer;
-    margin-top: 8px;
-}
-
-.add-todo-btn:hover {
-    border-color: #3b82f6;
-    color: #3b82f6;
-}
-
-.color-section {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin: 12px 0;
-}
-
-.color-label {
-    font-size: 14px;
-    color: #6b7280;
-}
-
-.color-options {
-    display: flex;
-    gap: 8px;
-}
-
-.color-btn {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    border: 2px solid #d1d5db;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.color-btn:hover {
-    transform: scale(1.1);
-}
-
-.color-btn.selected {
-    border-color: #000;
-    border-width: 3px;
-}
-
-.daily-checkbox-label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    margin: 12px 0;
-}
-
-.daily-checkbox {
-    width: 16px;
-    height: 16px;
-    cursor: pointer;
-}
-
-.daily-label-text {
-    font-size: 14px;
-    color: #6b7280;
-}
-
-.task-actions {
-    display: flex;
-    gap: 8px;
-    margin: 12px 0;
-}
-
-.complete-btn {
-    flex: 1;
-    padding: 12px;
-    background-color: #10b981;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-.complete-btn:hover {
-    background-color: #059669;
-}
-
-.delete-btn {
-    padding: 12px;
-    background-color: #ef4444;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-}
-
-.delete-btn:hover {
-    background-color: #dc2626;
-}
-
-.done-editing-btn {
-    width: 100%;
-    padding: 12px;
-    background-color: #e5e7eb;
-    color: #374151;
-    border: none;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-}
-
-.done-editing-btn:hover {
-    background-color: #d1d5db;
-}
-
-/* Add Task Buttons */
-.add-task-btn {
-    width: 100%;
-    padding: 12px;
-    border: 2px dashed #d1d5db;
-    background-color: transparent;
-    border-radius: 8px;
-    color: #6b7280;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    margin-bottom: 12px;
-    transition: all 0.2s;
-}
-
-.add-task-btn:hover {
-    border-color: #3b82f6;
-    color: #3b82f6;
-}
-
-.add-task-btn.todo-list:hover {
-    border-color: #8b5cf6;
-    color: #8b5cf6;
-}
-
 /* Month View */
 .month-view {
     height: 100%;
     overflow-y: auto;
     background-color: #f3f4f6;
     padding: 16px;
+    min-height: 0; /* iOS fix */
 }
 
 .month-header {
@@ -518,76 +268,6 @@ body {
 
 .calendar-cell:active {
     transform: scale(0.98);
-}
-
-.calendar-cell.other-month {
-    background-color: #f9fafb;
-}
-
-.calendar-cell.today {
-    border: 2px solid #3b82f6;
-}
-
-.calendar-date {
-    font-size: 14px;
-    font-weight: 600;
-    margin-bottom: 4px;
-}
-
-.calendar-date.current-month {
-    color: #1f2937;
-}
-
-.calendar-date.other-month {
-    color: #d1d5db;
-}
-
-.calendar-date.today {
-    color: #3b82f6;
-}
-
-.task-bars {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-}
-
-.task-bar {
-    height: 3px;
-    border-radius: 1.5px;
-}
-
-.task-bar.completed {
-    opacity: 0.4;
-}
-
-.task-count {
-    font-size: 10px;
-    color: #6b7280;
-    text-align: center;
-    margin-top: 2px;
-}
-
-/* Other Tabs */
-.other-tabs-view {
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.coming-soon {
-    text-align: center;
-}
-
-.coming-soon-icon {
-    font-size: 60px;
-    margin-bottom: 16px;
-}
-
-.coming-soon div:last-child {
-    font-size: 16px;
-    color: #6b7280;
 }
 
 /* Bottom Navigation */
