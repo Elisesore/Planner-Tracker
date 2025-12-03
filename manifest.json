@@ -1,12 +1,16 @@
 {
   "name": "Daily Planner & Tracker",
   "short_name": "Daily",
-  "start_url": "/Planner-Tracker/",
+  "start_url": "/Planner-Tracker/index.html",
+  "scope": "/Planner-Tracker/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
   "icons": [
-    { "src": "app-icon.png", "sizes": "736x726", "type": "image/png" },
-    { "src": "app-icon.png", "sizes": "736x726", "type": "image/png" }
+    {
+      "src": "/Planner-Tracker/app-icon.png",
+      "sizes": "736x726",
+      "type": "image/png"
+    }
   ]
 }
