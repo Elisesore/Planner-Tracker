@@ -1,7 +1,7 @@
 {
   "name": "Daily Planner & Tracker",
   "short_name": "Daily",
-  "start_url": "/index.html",
+  "start_url": "/Planner-Tracker/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#ffffff",
