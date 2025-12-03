@@ -9,11 +9,11 @@ body {
     background-color: #f9fafb;
     color: #1f2937;
     -webkit-font-smoothing: antialiased;
-    overflow: hidden;
+  
 }
 
 .app-container {
-    height: 100vh;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
 }
@@ -74,8 +74,9 @@ body {
 
 /* Main Content */
 .main-content {
-    flex: 1;
-    overflow: hidden;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .hidden {
