@@ -116,6 +116,7 @@ function addTask(date, isTodoList = false) {
         tasks[dateKey] = [];
     }
     tasks[dateKey].push(newTask);
+    saveToStorage();
     renderWeekView();
 }
 
@@ -146,6 +147,7 @@ function addTodoItem(date, taskId, isDaily) {
             );
         }
     }
+    saveToStorage();
     renderWeekView();
 }
 
@@ -180,9 +182,11 @@ function toggleTodoItem(date, taskId, itemId, isDaily) {
             );
         }
     }
+    saveToStorage();
     renderWeekView();
 }
 
+// CRITICAL FIX: Don't call renderWeekView() on text input
 function updateTodoItem(date, taskId, itemId, text, isDaily) {
     if (isDaily) {
         Object.keys(tasks).forEach(key => {
@@ -214,6 +218,8 @@ function updateTodoItem(date, taskId, itemId, text, isDaily) {
             );
         }
     }
+    saveToStorage();
+    // DON'T call renderWeekView() here - it destroys the input!
 }
 
 function deleteTodoItem(date, taskId, itemId, isDaily) {
@@ -237,6 +243,7 @@ function deleteTodoItem(date, taskId, itemId, isDaily) {
             );
         }
     }
+    saveToStorage();
     renderWeekView();
 }
 
@@ -258,9 +265,11 @@ function toggleTaskComplete(date, taskId, isDaily, dateKey) {
         }
     }
     editingTask = null;
+    saveToStorage();
     renderWeekView();
 }
 
+// CRITICAL FIX: Don't call renderWeekView() on text input
 function updateTask(date, taskId, updates, isDaily) {
     if (isDaily) {
         Object.keys(tasks).forEach(key => {
@@ -278,7 +287,12 @@ function updateTask(date, taskId, updates, isDaily) {
             );
         }
     }
-    renderWeekView();
+    saveToStorage();
+    
+    // ONLY re-render if we're changing something that needs visual update (not text)
+    if (!updates.text) {
+        renderWeekView();
+    }
 }
 
 function deleteTask(date, taskId, isDaily) {
@@ -295,7 +309,20 @@ function deleteTask(date, taskId, isDaily) {
         }
     }
     editingTask = null;
+    saveToStorage();
     renderWeekView();
+}
+
+// Storage Functions
+function saveToStorage() {
+    localStorage.setItem('weeklyPlannerTasks', JSON.stringify(tasks));
+}
+
+function loadFromStorage() {
+    const stored = localStorage.getItem('weeklyPlannerTasks');
+    if (stored) {
+        tasks = JSON.parse(stored);
+    }
 }
 
 // Rendering functions
@@ -523,70 +550,59 @@ function renderViewMode(task, date, isTaskComplete, dateKey) {
 
 function renderWeekView() {
     const weekContainer = document.getElementById('weekContainer');
+    weekContainer.innerHTML = '';
+
     const weekDates = getWeekDates(currentWeekStart);
 
-    // ONLY recreate columns if they don't exist OR date changed
-    if (weekContainer.children.length !== 7) {
-        weekContainer.innerHTML = '';
-        weekDates.forEach(date => {
-            const dayColumn = document.createElement('div');
-            dayColumn.className = 'day-column';
-            dayColumn.dataset.date = formatDate(date); // for future smart updates
+    weekDates.forEach(date => {
+        const dayColumn = document.createElement('div');
+        dayColumn.className = 'day-column';
 
-            const header = document.createElement('div');
-            header.className = 'day-header';
-            header.innerHTML = `
-                <div class="day-name">${getDayName(date)}</div>
-                <div class="day-date">${getDateDisplay(date)}</div>
-            `;
-            dayColumn.appendChild(header);
+        const header = document.createElement('div');
+        header.className = 'day-header';
+        const dayName = document.createElement('div');
+        dayName.className = 'day-name';
+        dayName.textContent = getDayName(date);
+        const dayDate = document.createElement('div');
+        dayDate.className = 'day-date';
+        dayDate.textContent = getDateDisplay(date);
+        header.appendChild(dayName);
+        header.appendChild(dayDate);
+        dayColumn.appendChild(header);
 
-            const tasksList = document.createElement('div');
-            tasksList.className = 'tasks-list';
-            dayColumn.appendChild(tasksList);
+        const tasksList = document.createElement('div');
+        tasksList.className = 'tasks-list';
 
-            weekContainer.appendChild(dayColumn);
-        });
-    }
-
-    // NOW only update the task lists (never destroy the input!)
-    weekDates.forEach((date, index) => {
-        const column = weekContainer.children[index];
-        const tasksList = column.querySelector('.tasks-list');
         const dayTasks = getTasksForDate(date);
-        const dateKey = formatDate(date);
-
-        // Preserve editing input if currently editing
-        const currentlyEditing = editingTask && editingTask.date === dateKey
-            ? editingTask.id
-            : null;
-
-        tasksList.innerHTML = ''; // OK to wipe only the task list
-
         dayTasks.forEach(task => {
-            const taskElement = renderTaskCard(task, date);
-            tasksList.appendChild(taskElement);
+            tasksList.appendChild(renderTaskCard(task, date));
         });
 
-        // Re-add buttons
         const addTaskBtn = document.createElement('button');
         addTaskBtn.className = 'add-task-btn';
         addTaskBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Add Task';
-        addTaskBtn.onclick = () => addTask(date, false);
+        addTaskBtn.addEventListener('click', () => addTask(date, false));
         tasksList.appendChild(addTaskBtn);
 
         const addTodoBtn = document.createElement('button');
         addTodoBtn.className = 'add-task-btn todo-list';
         addTodoBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Add To-Do List';
-        addTodoBtn.onclick = () => addTask(date, true);
+        addTodoBtn.addEventListener('click', () => addTask(date, true));
         tasksList.appendChild(addTodoBtn);
-    });
 
-    // Re-focus the input if we were editing
+        dayColumn.appendChild(tasksList);
+        weekContainer.appendChild(dayColumn);
+    });
+    
+    // Refocus the input after render if we're editing
     if (editingTask) {
         setTimeout(() => {
             const activeInput = document.querySelector('.task-input');
-            if (activeInput) activeInput.focus();
+            if (activeInput) {
+                activeInput.focus();
+                // Move cursor to end
+                activeInput.setSelectionRange(activeInput.value.length, activeInput.value.length);
+            }
         }, 0);
     }
 }
@@ -706,12 +722,16 @@ function setActiveTab(tab) {
 }
 
 // Initialize
-document.getElementById('weekViewBtn').addEventListener('click', () => setViewMode('week'));
-document.getElementById('monthViewBtn').addEventListener('click', () => setViewMode('month'));
+document.addEventListener('DOMContentLoaded', () => {
+    loadFromStorage();
+    
+    document.getElementById('weekViewBtn').addEventListener('click', () => setViewMode('week'));
+    document.getElementById('monthViewBtn').addEventListener('click', () => setViewMode('month'));
 
-document.querySelectorAll('.nav-btn').forEach(btn => {
-    btn.addEventListener('click', () => setActiveTab(btn.dataset.tab));
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.addEventListener('click', () => setActiveTab(btn.dataset.tab));
+    });
+
+    // Initial render
+    renderWeekView();
 });
-
-// Initial render
-renderWeekView();
