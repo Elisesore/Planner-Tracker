@@ -116,39 +116,75 @@ function addTask(date, isTodoList = false) {
         tasks[dateKey] = [];
     }
     tasks[dateKey].push(newTask);
-    renderWeekView();
-}
+    function renderWeekView() {
+    const weekContainer = document.getElementById('weekContainer');
+    const weekDates = getWeekDates(currentWeekStart);
 
-function addTodoItem(date, taskId, isDaily) {
-    const newItem = {
-        id: Date.now(),
-        text: 'New item',
-        completed: false
-    };
+    // ONLY recreate columns if they don't exist OR date changed
+    if (weekContainer.children.length !== 7) {
+        weekContainer.innerHTML = '';
+        weekDates.forEach(date => {
+            const dayColumn = document.createElement('div');
+            dayColumn.className = 'day-column';
+            dayColumn.dataset.date = formatDate(date); // for future smart updates
 
-    if (isDaily) {
-        Object.keys(tasks).forEach(key => {
-            if (!key.endsWith('-completions') && tasks[key]) {
-                tasks[key] = tasks[key].map(task =>
-                    task.id === taskId 
-                        ? { ...task, todoItems: [...(task.todoItems || []), newItem] }
-                        : task
-                );
-            }
+            const header = document.createElement('div');
+            header.className = 'day-header';
+            header.innerHTML = `
+                <div class="day-name">${getDayName(date)}</div>
+                <div class="day-date">${getDateDisplay(date)}</div>
+            `;
+            dayColumn.appendChild(header);
+
+            const tasksList = document.createElement('div');
+            tasksList.className = 'tasks-list';
+            dayColumn.appendChild(tasksList);
+
+            weekContainer.appendChild(dayColumn);
         });
-    } else {
-        const dateKey = formatDate(date);
-        if (tasks[dateKey]) {
-            tasks[dateKey] = tasks[dateKey].map(task =>
-                task.id === taskId 
-                    ? { ...task, todoItems: [...(task.todoItems || []), newItem] }
-                    : task
-            );
-        }
     }
-    renderWeekView();
-}
 
+    // NOW only update the task lists (never destroy the input!)
+    weekDates.forEach((date, index) => {
+        const column = weekContainer.children[index];
+        const tasksList = column.querySelector('.tasks-list');
+        const dayTasks = getTasksForDate(date);
+        const dateKey = formatDate(date);
+
+        // Preserve editing input if currently editing
+        const currentlyEditing = editingTask && editingTask.date === dateKey
+            ? editingTask.id
+            : null;
+
+        tasksList.innerHTML = ''; // OK to wipe only the task list
+
+        dayTasks.forEach(task => {
+            const taskElement = renderTaskCard(task, date);
+            tasksList.appendChild(taskElement);
+        });
+
+        // Re-add buttons
+        const addTaskBtn = document.createElement('button');
+        addTaskBtn.className = 'add-task-btn';
+        addTaskBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Add Task';
+        addTaskBtn.onclick = () => addTask(date, false);
+        tasksList.appendChild(addTaskBtn);
+
+        const addTodoBtn = document.createElement('button');
+        addTodoBtn.className = 'add-task-btn todo-list';
+        addTodoBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg> Add To-Do List';
+        addTodoBtn.onclick = () => addTask(date, true);
+        tasksList.appendChild(addTodoBtn);
+    });
+
+    // Re-focus the input if we were editing
+    if (editingTask) {
+        setTimeout(() => {
+            const activeInput = document.querySelector('.task-input');
+            if (activeInput) activeInput.focus();
+        }, 0);
+    }
+}
 function toggleTodoItem(date, taskId, itemId, isDaily) {
     if (isDaily) {
         Object.keys(tasks).forEach(key => {
