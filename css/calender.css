@@ -9,10 +9,11 @@ body {
     background-color: #f9fafb;
     color: #1f2937;
     -webkit-font-smoothing: antialiased;
+    overflow: hidden;
 }
 
 .app-container {
-    min-height: 100vh;
+    height: 100vh;
     display: flex;
     flex-direction: column;
 }
@@ -73,12 +74,8 @@ body {
 
 /* Main Content */
 .main-content {
-    flex: 1 1 auto;
-    overflow: hidden;                  /* ← changed from auto */
-    background-color: white;           /* ← kills grey */
-    display: flex;
-    flex-direction: column;
-    -webkit-overflow-scrolling: touch;
+    flex: 1;
+    overflow: hidden;
 }
 
 .hidden {
@@ -87,27 +84,16 @@ body {
 
 /* Week View */
 .week-view {
-    flex: 1;
-    background-color: white;           /* ← no more grey */
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-}
-
-.week-container {
-    flex: 1;
-    display: flex;
-    width: 100%;
-    min-width: 2240px;                 /* 7 × 320px */
+    height: 100%;
     overflow-x: auto;
     overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
-    scroll-snap-type: x mandatory;
-    
-    /* THE THREE LINES THAT FIX THE KEYBOARD ON iOS 18 */
-    contain: strict;
-    transform: translateZ(0);
-    -webkit-transform: translateZ(0);
+}
+
+.week-container {
+    display: flex;
+    height: 100%;
+    min-width: max-content;
 }
 
 .day-column {
@@ -117,14 +103,13 @@ body {
     border-right: 1px solid #e5e7eb;
     display: flex;
     flex-direction: column;
-    scroll-snap-align: start;
 }
+
 .day-header {
     padding: 16px;
     text-align: center;
     border-bottom: 1px solid #e5e7eb;
     background-color: white;
-    
 }
 
 .day-name {
@@ -639,16 +624,12 @@ body {
     font-weight: 500;
 }
 
-.main-content, .week-view, .week-container, .day-column {
-    transform: translateZ(0);   /* forces GPU layer — stops iOS keyboard bug */
-}
-
 /* Mobile Optimizations */
 @media (max-width: 375px) {
     .day-column {
         width: 280px;
     }
-
+    
     .calendar-cell {
         min-height: 70px;
         padding: 6px;
